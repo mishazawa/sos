@@ -1,0 +1,8 @@
+node_modules/
+tmp/
+test_data/
+hole
+*.m3u8
+*.ts
+*.mp4
+*.html
