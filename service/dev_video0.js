@@ -1,5 +1,10 @@
-const fs = require('fs');
 const ffmpeg = require('fluent-ffmpeg');
+
+setInterval(() => {
+  console.log('CPU usage:', process.cpuUsage());
+  console.log('Memory consumption:', process.memoryUsage().rss);
+  console.log('Uptime:', parseInt(process.uptime(), 10), 's');
+}, 60e3)
 
 ffmpeg()
   .input('/dev/video0')

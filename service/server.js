@@ -3,30 +3,33 @@ const express = require('express');
 
 const app = express();
 
-app.get('/api/v1/tmp/:id', (req, res) => {
-  const stream = fs.createReadStream('./tmp/' + req.params.id);
+const notFound = (res) => (err) => res.setStatus(404).send(JSON.stringify(err, null, 2));
+
+const contentType = (res, ct) => {
   res.writeHead(200, {
-    'Content-Type': 'video/mp2t',
+    'Content-Type': ct,
     'Access-Control-Allow-Origin': '*'
   });
+}
+
+app.get('/api/v1/tmp/:id', (req, res) => {
+  const stream = fs.createReadStream('./tmp/' + req.params.id);
+  contentType(res, 'video/mp2t');
+  stream.on('error', notFound(res));
   stream.pipe(res);
 });
 
-app.get('/api/v1/stream', (req, res) => {
-  const stream = fs.createReadStream('./playlist.m3u8');
-  res.writeHead(200, {
-    'Content-Type': 'application/vnd.apple.mpegurl',
-    'Access-Control-Allow-Origin': '*'
-  });
+app.get('/api/v1/live.m3u8', (req, res) => {
+  const stream = fs.createReadStream('./tmp/playlist.m3u8');
+  contentType(res, 'application/vnd.apple.mpegurl');
+  stream.on('error', notFound(res));
   stream.pipe(res);
 });
 
 app.get('*', (req, res) => {
   const stream = fs.createReadStream('./service/index.html');
-  res.writeHead(200, {
-    'Content-Type': 'text/html',
-    'Access-Control-Allow-Origin': '*'
-  });
+  contentType(res, 'text/html');
+  stream.on('error', notFound(res));
   stream.pipe(res);
 });
 
